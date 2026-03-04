@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization; // EZT A SORT ADJUK HOZZÁ!
+using System.Text.Json.Serialization; 
 
 namespace MealPlannerApp.Shared.Models
 {
@@ -16,9 +16,6 @@ namespace MealPlannerApp.Shared.Models
 
         public int RecipeId { get; set; }
 
-        // EZ AZ ATTRIBÚTUM MEGOLD MINDENT:
-        // Azt mondja a rendszernek, hogy amikor JSON-t készít,
-        // ezt a visszafelé mutató hivatkozást hagyja figyelmen kívül.
         [JsonIgnore]
         public Recipe? Recipe { get; set; }
     }
