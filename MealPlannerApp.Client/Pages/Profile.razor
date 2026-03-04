@@ -76,7 +76,6 @@
     {
         try
         {
-            // Amikor megnyílik az oldal, betöltjük a mentett beállításokat
             preferences = await Http.GetFromJsonAsync<UserPreferencesDto>("api/profile/preferences") ?? new UserPreferencesDto();
         }
         catch (Exception)
