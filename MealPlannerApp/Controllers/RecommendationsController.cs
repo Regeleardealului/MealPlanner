@@ -26,13 +26,10 @@ namespace MealPlannerApp.Controllers
                 query = query.Where(r => r.PrepTimeInMinutes <= maxPrepTime);
             }
 
-            // 1. Lekérjük az adatbázisból az eddigi szűrésnek megfelelő recepteket
             var recipesFromDb = await query.ToListAsync();
 
-            // 2. A program memóriájában végezzük el a címke alapú szűrést
             if (!string.IsNullOrEmpty(tag))
             {
-                // A Contains() metódus a memóriában lévő listán már tökéletesen működik
                 recipesFromDb = recipesFromDb.Where(r => r.Tags != null && r.Tags.Contains(tag)).ToList();
             }
 
