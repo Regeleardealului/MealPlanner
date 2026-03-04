@@ -60,17 +60,13 @@ else
         }
     }
 
-    // EZ A METÓDUS LETT KIJAVÍTVA
     private async Task ConfirmDelete()
     {
-        // A ShowMessageBox közvetlenül egy 'bool?' eredménnyel tér vissza.
         var result = await DialogService.ShowMessageBox(
             "Törlés Megerősítése",
             "Biztosan törölni szeretnéd ezt a receptet? A művelet nem vonható vissza.",
             yesText: "Törlés!", cancelText: "Mégse");
 
-        // Nincs szükség a 'dialog.Result'-ra, a 'result' változó már maga az eredmény.
-        // Azt ellenőrizzük, hogy a 'result' nem-e null és az értéke 'true'.
         if (result == true)
         {
             var response = await Http.DeleteAsync($"api/recipes/{Id}");
@@ -85,4 +81,5 @@ else
             }
         }
     }
+
 }
