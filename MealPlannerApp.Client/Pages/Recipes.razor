@@ -18,7 +18,6 @@
 }
 else if (!recipes.Any())
 {
-    @* Ez a rész fontos: Ha a lista megérkezett, de üres! *@
     <MudAlert Severity="Severity.Info" Class="mt-4">
         Még nincs egyetlen recepted sem. Kattints az "Új recept" gombra a kezdéshez!
     </MudAlert>
@@ -38,7 +37,6 @@ else
                     <MudCardActions>
                         <MudChip T="string" Icon="@Icons.Material.Filled.Timer" Color="Color.Info" Label="true">@recipe.PrepTimeInMinutes perc</MudChip>
 
-                        @* JAVÍTÁS ITT: A Color tulajdonság most már a segédfüggvényt hívja *@
                         <MudChip T="string" Icon="@Icons.Material.Filled.BarChart" Color="@GetDifficultyColor(recipe.Difficulty)" Label="true">@recipe.Difficulty.ToString()</MudChip>
                     </MudCardActions>
                 </MudCard>
@@ -67,14 +65,13 @@ else
         Navigation.NavigateTo($"/recipe/{recipeId}");
     }
 
-    // EZ AZ ÚJ SEGÉDFÜGGVÉNY a színek váltásához
     private Color GetDifficultyColor(DifficultyLevel level)
     {
         return level switch
         {
-            DifficultyLevel.Könnyű => Color.Success, // Zöld
-            DifficultyLevel.Közepes => Color.Warning, // Narancs
-            DifficultyLevel.Nehéz => Color.Error,   // Piros
+            DifficultyLevel.Könnyű => Color.Success, 
+            DifficultyLevel.Közepes => Color.Warning, 
+            DifficultyLevel.Nehéz => Color.Error, 
             _ => Color.Default
         };
     }
