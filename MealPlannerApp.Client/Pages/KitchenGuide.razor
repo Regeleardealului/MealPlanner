@@ -4,12 +4,10 @@
 <PageTitle>MealPlanner</PageTitle>
 
 <MudText Typo="Typo.h3" Class="mb-2" Style="color: #424242; font-weight: 600;">Főzési Kalauz 🧠</MudText>
-@* ITT A JAVÍTOTT SZÖVEGED: *@
 <MudText Typo="Typo.body1" Class="mb-6">Hasznos kalkulátorok és puskák a mindennapi főzéshez, hogy sose kelljen elhagynod a konyhát!</MudText>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" Color="Color.Primary">
 
-    @* 1. FÜL: MÉRTÉKEGYSÉG KALKULÁTOR *@
     <MudTabPanel Text="Mértékegység Kalkulátor" Icon="@Icons.Material.Filled.Calculate">
         <MudText Typo="Typo.h6" Class="mb-4">Amerikai bögre (Cup) és kanál átváltó grammra</MudText>
 
@@ -47,7 +45,6 @@
         </MudPaper>
     </MudTabPanel>
 
-    @* 2. FÜL: HELYETTESÍTŐK (KIBŐVÍTVE) *@
     <MudTabPanel Text="Mit mivel helyettesítsek?" Icon="@Icons.Material.Filled.SwapHoriz">
         <MudText Typo="Typo.h6" Class="mb-4">Ha elfogyott valami otthon, ezekkel trükközhetsz:</MudText>
 
@@ -103,7 +100,6 @@
         </MudSimpleTable>
     </MudTabPanel>
 
-    @* 3. FÜL: FŐZÉSI IDŐK (KIBŐVÍTVE 4 KÁRTYÁRA) *@
     <MudTabPanel Text="Tökéletes Főzési Idők" Icon="@Icons.Material.Filled.Timer">
         <MudGrid>
             <MudItem xs="12" md="6">
@@ -163,7 +159,6 @@
 </MudTabs>
 
 @code {
-    // Kalkulátor változói
     private double amount = 1;
     private string selectedUnit = "Bögre (Cup)";
     private string selectedIngredient = "Búzaliszt";
