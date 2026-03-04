@@ -3,7 +3,6 @@
 <MudForm @ref="form" @bind-IsValid="@success">
     <MudCard Class="pa-4">
         <MudCardContent>
-            @* A form többi része változatlan... *@
             <MudTextField @bind-Value="Recipe.Title" Label="Cím" Required="true" RequiredError="A cím kötelező!" />
             <MudTextField @bind-Value="Recipe.Description" Label="Leírás" Lines="3" Class="mt-3" />
             <MudTextField @bind-Value="Recipe.ImageUrl" Label="Kép URL" Class="mt-3" />
@@ -30,7 +29,6 @@
 
         </MudCardContent>
         <MudCardActions>
-            @* JAVÍTÁS ITT: ButtonType="Submit" helyett direkt @onclick hívást használunk *@
             <MudButton OnClick="SubmitFormAsync" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!success)" Class="ml-auto">Mentés</MudButton>
         </MudCardActions>
     </MudCard>
@@ -56,7 +54,6 @@
         Recipe.Ingredients.Remove(ingredient);
     }
 
-    // Ez a metódus most már a gomb @onclick eseményére van kötve
     private async Task SubmitFormAsync()
     {
         await form.Validate();
