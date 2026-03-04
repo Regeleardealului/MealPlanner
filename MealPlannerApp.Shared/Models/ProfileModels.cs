@@ -13,7 +13,6 @@ namespace MealPlannerApp.Shared.Models
         public bool IsGlutenFree { get; set; }
         public bool IsLactoseFree { get; set; }
 
-        // Ide írhatja be a user szabadon: "gomba, mazsola, földimogyoró"
         public string AllergiesOrDislikes { get; set; } = string.Empty;
     }
 
@@ -24,3 +23,4 @@ namespace MealPlannerApp.Shared.Models
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
 }
+
