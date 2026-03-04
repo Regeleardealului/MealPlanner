@@ -62,7 +62,6 @@ else if (recommendedRecipes != null)
         isLoading = true;
         recommendedRecipes = null;
 
-        // Összeállítjuk az URL-t a query paraméterekkel
         var requestUri = $"api/recommendations?maxPrepTime={maxPrepTime}&tag={selectedTag}";
 
         try
@@ -78,4 +77,5 @@ else if (recommendedRecipes != null)
             isLoading = false;
         }
     }
+
 }
