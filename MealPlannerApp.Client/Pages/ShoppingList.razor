@@ -6,7 +6,6 @@
 
 <PageTitle>MealPlanner</PageTitle>
 
-@* ÚJ, DIZÁJNOS FEJLÉC A TÖRLÉS GOMMBAL *@
 <div class="d-flex justify-space-between align-center mb-6">
     <div>
         <MudText Typo="Typo.h3" Class="mb-2" Style="color: #424242; font-weight: 600;">Miket kell megvennem? 🤔</MudText>
@@ -65,16 +64,13 @@ else
     {
         try
         {
-            // 1. Megpróbáljuk értesíteni a szervert a törlésről
             var response = await Http.DeleteAsync("api/shoppinglist/clear");
 
-            // 2. Azonnal kiürítjük a listát a képernyőn (hogy a felhasználó lássa az eredményt)
             if (shoppingList != null)
             {
                 shoppingList.Clear();
             }
 
-            // 3. Visszajelzés a felhasználónak
             if (response.IsSuccessStatusCode)
             {
                 Snackbar.Add("A bevásárlólista sikeresen kiürítve!", Severity.Success);
