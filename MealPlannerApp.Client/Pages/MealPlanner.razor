@@ -45,7 +45,6 @@
                 <MudTh></MudTh>
                 @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().OrderBy(d => ((int)d + 6) % 7))
                 {
-                    @* JAVÍTÁS ITT: A teljes kifejezést @(...) blokkba tettük *@
                     <MudTh>@(new CultureInfo("hu-HU").DateTimeFormat.GetDayName(day))</MudTh>
                 }
             </HeaderContent>
