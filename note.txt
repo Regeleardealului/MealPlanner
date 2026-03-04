@@ -1,0 +1,2 @@
+# server részének a /Dependencies/Projects-ben hozzá kell rendelni mind a Client, mind pedig a Shared komponenseket
+# kliens oldalnak a /Dependencies/Projects-ben hozzá kell rendelni a Shared komponenst
