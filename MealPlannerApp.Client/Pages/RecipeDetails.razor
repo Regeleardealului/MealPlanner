@@ -1,0 +1,88 @@
+﻿@page "/recipe/{Id:int}"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>MealPlanner</PageTitle>
+
+@if (recipe == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h3">@recipe.Title</MudText>
+
+        <div class="d-flex justify-end mb-2">
+            <MudButton Href="@($"/recipe/edit/{recipe.Id}")" Variant="Variant.Outlined" Color="Color.Primary" Class="mr-2">Szerkesztés</MudButton>
+            <MudButton OnClick="ConfirmDelete" Variant="Variant.Filled" Color="Color.Error">Törlés</MudButton>
+        </div>
+
+        <MudText Typo="Typo.subtitle1" Class="mb-4">@recipe.Description</MudText>
+
+        <MudImage Src="@recipe.ImageUrl" Height="300" Alt="@recipe.Title" Class="rounded-lg mb-4" />
+
+        <MudText Typo="Typo.h5" Class="mt-4">Hozzávalók</MudText>
+        <MudList T="string" clickable="false">
+            @foreach (var ingredient in recipe.Ingredients)
+            {
+                <MudListItem T="string">
+                    @ingredient.Quantity @ingredient.Unit - @ingredient.Name
+                </MudListItem>
+            }
+        </MudList>
+
+        <MudText Typo="Typo.h5" Class="mt-4">Elkészítés</MudText>
+        <MudText>@((MarkupString)recipe.Instructions.Replace("\n", "<br/>"))</MudText>
+    </MudPaper>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Recipe? recipe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            recipe = await Http.GetFromJsonAsync<Recipe>($"api/recipes/{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hiba a recept betöltése közben: {ex.Message}");
+        }
+    }
+
+    // EZ A METÓDUS LETT KIJAVÍTVA
+    private async Task ConfirmDelete()
+    {
+        // A ShowMessageBox közvetlenül egy 'bool?' eredménnyel tér vissza.
+        var result = await DialogService.ShowMessageBox(
+            "Törlés Megerősítése",
+            "Biztosan törölni szeretnéd ezt a receptet? A művelet nem vonható vissza.",
+            yesText: "Törlés!", cancelText: "Mégse");
+
+        // Nincs szükség a 'dialog.Result'-ra, a 'result' változó már maga az eredmény.
+        // Azt ellenőrizzük, hogy a 'result' nem-e null és az értéke 'true'.
+        if (result == true)
+        {
+            var response = await Http.DeleteAsync($"api/recipes/{Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Recept sikeresen törölve!", Severity.Success);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                Snackbar.Add("Hiba történt a törlés során.", Severity.Error);
+            }
+        }
+    }
+}

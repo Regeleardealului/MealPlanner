@@ -1,0 +1,103 @@
+﻿@page "/chat"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient Http
+@inject ApiAuthenticationStateProvider AuthStateProvider
+
+<PageTitle>MealPlanner</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Okos Konyhatárs 🤖</MudText>
+
+<MudPaper Elevation="3" Class="pa-4" Style="height: 500px; overflow-y: auto;" id="chat-container">
+    @foreach (var message in messages)
+    {
+        <div class="@(message.Role.ToLower() == "user" ? "d-flex justify-end" : "d-flex justify-start") my-2">
+            <MudPaper Elevation="@(message.Role.ToLower() == "user" ? 0 : 2)" Class="@(message.Role.ToLower() == "user" ? "pa-3 mud-theme-primary white-text" : "pa-3")" Style="max-width: 70%; border-radius: 12px;">
+                <MudText>@((MarkupString)message.Content.Replace("\n", "<br/>"))</MudText>
+            </MudPaper>
+        </div>
+    }
+</MudPaper>
+
+<MudPaper Elevation="3" Class="pa-2 mt-2 d-flex">
+    <MudTextField @bind-Value="currentMessage" Label="Kérdezz valamit..." Variant="Variant.Outlined" Class="flex-grow-1" @onkeyup="HandleKeyUp" />
+    <MudIconButton Icon="@Icons.Material.Filled.Send" OnClick="SendMessage" Disabled="isLoading" Color="Color.Primary" Class="ml-2" />
+</MudPaper>
+
+@if (isLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-2" />
+}
+
+@code {
+    private List<ConversationMessage> messages = new List<ConversationMessage>();
+    private string currentMessage = "";
+    private bool isLoading = false;
+
+    // ITT VAN AZ ÚJ, SZEMÉLYRE SZABOTT KÖSZÖNÉS
+    protected override async Task OnInitializedAsync()
+    {
+        // Lekérjük, ki van épp bejelentkezve
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userName = authState.User.Identity?.Name ?? "Szakács";
+
+        // Beállítjuk a kezdő üzenetet a felhasználó nevével
+        messages.Add(new ConversationMessage
+        {
+            Role = "assistant",
+            Content = $"Szia {userName}! Miben segíthetek ma? Kérdezz a receptekkel kapcsolatban."
+        });
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(currentMessage) || isLoading) return;
+
+        var userMessage = new ConversationMessage { Role = "user", Content = currentMessage };
+        messages.Add(userMessage);
+        var userQuestion = currentMessage;
+        currentMessage = "";
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/chat/ask", userQuestion);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var aiResponse = await response.Content.ReadAsStringAsync();
+                messages.Add(new ConversationMessage { Role = "assistant", Content = aiResponse });
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                messages.Add(new ConversationMessage { Role = "assistant", Content = $"Bocsánat, hiba történt: {error}" });
+            }
+        }
+        catch (Exception ex)
+        {
+            messages.Add(new ConversationMessage { Role = "assistant", Content = $"Bocsánat, nem tudtam kapcsolódni a szerverhez: {ex.Message}" });
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+}
+
+<style>
+    .white-text {
+        color: white !important;
+    }
+</style>

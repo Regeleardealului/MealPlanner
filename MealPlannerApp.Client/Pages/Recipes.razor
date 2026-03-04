@@ -1,0 +1,81 @@
+﻿@page "/"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>MealPlanner</PageTitle>
+
+<div class="d-flex align-center mb-4">
+    <MudText Typo="Typo.h3">Digitális Szakácskönyv 👩‍🍳</MudText>
+    <MudSpacer />
+    <MudButton Href="/recipe/create" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">Új Recept</MudButton>
+</div>
+
+@if (recipes == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+}
+else if (!recipes.Any())
+{
+    @* Ez a rész fontos: Ha a lista megérkezett, de üres! *@
+    <MudAlert Severity="Severity.Info" Class="mt-4">
+        Még nincs egyetlen recepted sem. Kattints az "Új recept" gombra a kezdéshez!
+    </MudAlert>
+}
+else
+{
+    <MudGrid Spacing="3">
+        @foreach (var recipe in recipes)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="3" @onclick="() => ViewRecipe(recipe.Id)" Style="cursor: pointer;">
+                    <MudCardMedia Image="@recipe.ImageUrl" Height="200" />
+                    <MudCardContent>
+                        <MudText Typo="Typo.h5">@recipe.Title</MudText>
+                        <MudText Typo="Typo.body2">@recipe.Description</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudChip T="string" Icon="@Icons.Material.Filled.Timer" Color="Color.Info" Label="true">@recipe.PrepTimeInMinutes perc</MudChip>
+
+                        @* JAVÍTÁS ITT: A Color tulajdonság most már a segédfüggvényt hívja *@
+                        <MudChip T="string" Icon="@Icons.Material.Filled.BarChart" Color="@GetDifficultyColor(recipe.Difficulty)" Label="true">@recipe.Difficulty.ToString()</MudChip>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    private Recipe[]? recipes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            recipes = await Http.GetFromJsonAsync<Recipe[]>("api/recipes");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hiba a receptek betöltése közben: {ex.Message}");
+        }
+    }
+
+    private void ViewRecipe(int recipeId)
+    {
+        Navigation.NavigateTo($"/recipe/{recipeId}");
+    }
+
+    // EZ AZ ÚJ SEGÉDFÜGGVÉNY a színek váltásához
+    private Color GetDifficultyColor(DifficultyLevel level)
+    {
+        return level switch
+        {
+            DifficultyLevel.Könnyű => Color.Success, // Zöld
+            DifficultyLevel.Közepes => Color.Warning, // Narancs
+            DifficultyLevel.Nehéz => Color.Error,   // Piros
+            _ => Color.Default
+        };
+    }
+}

@@ -1,0 +1,148 @@
+﻿@page "/mit-fozzek"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>MealPlanner</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 text-center">
+
+    <MudText Typo="Typo.h2" Class="mb-4" Style="color: #00897b; font-weight: 700;">Mit főzzek ma? 🎲</MudText>
+    <MudText Typo="Typo.h6" Class="mb-8" Style="color: #616161;">Nincs ötleted a mai menühöz? Pörgess egyet, és hagyd, hogy a sors (pontosabban a saját receptkönyved) döntsön helyetted!</MudText>
+
+    @if (recipes == null)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (!recipes.Any())
+    {
+        <MudAlert Severity="Severity.Warning" Elevation="2">A receptkönyved még üres! Előbb ments el néhány receptet, hogy legyen miből sorsolni.</MudAlert>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   Style="border-radius: 50px; padding: 15px 40px; font-size: 1.2rem; font-weight: bold; transition: transform 0.2s;"
+                   OnClick="SpinTheWheel"
+                   Disabled="@isSpinning"
+                   StartIcon="@(isSpinning ? "" : Icons.Material.Filled.AutoFixHigh)">
+            @if (isSpinning)
+            {
+                <MudText>Sorsolás folyamatban...</MudText>
+            }
+            else
+            {
+                <MudText>Pörgess egy receptet!</MudText>
+            }
+        </MudButton>
+
+        @if (isSpinning)
+        {
+            <div class="mt-12 d-flex justify-center">
+                <MudProgressCircular Color="Color.Secondary" Size="Size.Large" Indeterminate="true" />
+            </div>
+        }
+        else if (selectedRecipe != null)
+        {
+            <div class="mt-12 fade-in">
+                <MudText Typo="Typo.h5" Class="mb-4" Style="font-weight: 600; color: #424242;">✨ A mai nyertes ajánlatunk számodra: ✨</MudText>
+
+                <MudCard Elevation="6" Style="max-width: 500px; margin: 0 auto; border-radius: 16px; overflow: hidden;">
+
+                    @if (!string.IsNullOrEmpty(selectedRecipe.ImageUrl))
+                    {
+                        <MudCardMedia Image="@selectedRecipe.ImageUrl" Height="250" />
+                    }
+                    else
+                    {
+                        <MudCardMedia Image="https://images.unsplash.com/photo-1495521821757-a1efb6729352?q=80&w=800&auto=format&fit=crop" Height="250" />
+                    }
+
+                    <MudCardContent Class="pa-6">
+                        <MudText Typo="Typo.h4" Style="color: #00897b; font-weight: bold;" Class="mb-2">@selectedRecipe.Title</MudText>
+                        <MudText Typo="Typo.body1" Class="mb-6" Style="color: #757575;">@selectedRecipe.Description</MudText>
+
+                        <MudDivider Class="mb-4" />
+
+                        <div class="d-flex justify-center gap-4">
+                            <MudChip T="string" Color="Color.Info" Icon="@Icons.Material.Filled.Timer">@selectedRecipe.PrepTimeInMinutes perc</MudChip>
+
+                            @* JAVÍTVA: A kérdőjelek eltűntek, mivel az Enum nem lehet null *@
+                            <MudChip T="string" Color="@GetDifficultyColor(selectedRecipe.Difficulty.ToString())" Icon="@Icons.Material.Filled.SignalCellularAlt">@selectedRecipe.Difficulty.ToString()</MudChip>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+        }
+    }
+</MudContainer>
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .mud-button-filled.mud-button-filled-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4);
+    }
+</style>
+
+@code {
+    private List<Recipe>? recipes;
+    private Recipe? selectedRecipe;
+    private bool isSpinning = false;
+    private Random random = new Random();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            recipes = await Http.GetFromJsonAsync<List<Recipe>>("api/recipes");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hiba a receptek lekérésekor: {ex.Message}");
+            recipes = new List<Recipe>();
+        }
+    }
+
+    private async Task SpinTheWheel()
+    {
+        if (recipes == null || !recipes.Any()) return;
+
+        isSpinning = true;
+        selectedRecipe = null;
+
+        await Task.Delay(1200);
+
+        int index = random.Next(recipes.Count);
+        selectedRecipe = recipes[index];
+
+        isSpinning = false;
+    }
+
+    private Color GetDifficultyColor(string? difficulty)
+    {
+        return difficulty?.ToLower() switch
+        {
+            var d when d == "könnyű" || d == "easy" => Color.Success,
+            var d when d == "közepes" || d == "medium" => Color.Warning,
+            var d when d == "nehéz" || d == "hard" => Color.Error,
+            _ => Color.Default
+        };
+    }
+}

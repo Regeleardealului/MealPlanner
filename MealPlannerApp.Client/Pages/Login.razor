@@ -1,0 +1,47 @@
+﻿@page "/login"
+@layout MealPlannerApp.Client.Layout.AuthLayout
+@using MealPlannerApp.Shared.Models
+@using Blazored.LocalStorage
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+@* A logó stílusos megjelenítése *@
+<MudImage Src="MealPlanner.png" Alt="MealPlanner Logo" Class="mx-auto d-block mb-6" Style="width: 150px;" />
+
+<MudText Typo="Typo.h6" Align="Align.Center" Class="mb-6">Bejelentkezés</MudText>
+
+<MudTextField @bind-Value="loginDto.Email" Label="Email" Variant="Variant.Outlined" ShrinkLabel="true" Class="mb-4" />
+<MudTextField @bind-Value="loginDto.Password" Label="Jelszó" Variant="Variant.Outlined" InputType="InputType.Password" ShrinkLabel="true" Class="mb-6" />
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <MudAlert Severity="Severity.Error" Class="mb-4">@error</MudAlert>
+}
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" OnClick="HandleLogin">Belépés</MudButton>
+<MudLink Href="/register" Class="mt-4 d-block text-center">Nincs még fiókod? Regisztrálj!</MudLink>
+
+@code {
+    private UserLoginDto loginDto = new();
+    private string? error;
+
+    private async Task HandleLogin()
+    {
+        var result = await Http.PostAsJsonAsync("api/auth/login", loginDto);
+        var response = await result.Content.ReadFromJsonAsync<AuthResponseDto>();
+
+        if (result.IsSuccessStatusCode && response!.IsAuthSuccessful)
+        {
+            await LocalStorage.SetItemAsync("authToken", response.Token);
+            ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsAuthenticated(response.Token!);
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", response.Token);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            error = response?.ErrorMessage ?? "Hibás email vagy jelszó!";
+        }
+    }
+}

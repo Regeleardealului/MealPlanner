@@ -1,0 +1,33 @@
+﻿@page "/recipe/create"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@using MealPlannerApp.Client.Components
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>MealPlanner</PageTitle>
+<MudText Typo="Typo.h3" GutterBottom="true">Új Recept Létrehozása</MudText>
+
+@if (recipe != null)
+{
+    <RecipeForm Recipe="recipe" OnValidSubmit="HandleSave" />
+}
+
+@code {
+    private Recipe recipe = new();
+
+    private async Task HandleSave()
+    {
+        var response = await Http.PostAsJsonAsync("api/recipes", recipe);
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Recept sikeresen létrehozva!", Severity.Success);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Snackbar.Add("Hiba történt a mentés során.", Severity.Error);
+        }
+    }
+}

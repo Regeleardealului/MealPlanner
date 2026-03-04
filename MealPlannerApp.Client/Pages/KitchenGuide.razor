@@ -1,0 +1,219 @@
+﻿@page "/konyhai-kisokos"
+@attribute [Authorize]
+
+<PageTitle>MealPlanner</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-2" Style="color: #424242; font-weight: 600;">Főzési Kalauz 🧠</MudText>
+@* ITT A JAVÍTOTT SZÖVEGED: *@
+<MudText Typo="Typo.body1" Class="mb-6">Hasznos kalkulátorok és puskák a mindennapi főzéshez, hogy sose kelljen elhagynod a konyhát!</MudText>
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" Color="Color.Primary">
+
+    @* 1. FÜL: MÉRTÉKEGYSÉG KALKULÁTOR *@
+    <MudTabPanel Text="Mértékegység Kalkulátor" Icon="@Icons.Material.Filled.Calculate">
+        <MudText Typo="Typo.h6" Class="mb-4">Amerikai bögre (Cup) és kanál átváltó grammra</MudText>
+
+        <MudGrid Class="align-center mb-6">
+            <MudItem xs="12" md="3">
+                <MudNumericField @bind-Value="amount" Label="Mennyiség" Variant="Variant.Outlined" Min="0.1" Step="0.5" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudSelect @bind-Value="selectedUnit" Label="Mértékegység" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("Bögre (Cup)")" />
+                    <MudSelectItem Value="@("Evőkanál (EK)")" />
+                    <MudSelectItem Value="@("Teáskanál (TK)")" />
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="1" Class="d-flex justify-center">
+                <MudText Typo="Typo.h5">✖</MudText>
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudSelect @bind-Value="selectedIngredient" Label="Alapanyag" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("Búzaliszt")" />
+                    <MudSelectItem Value="@("Kristálycukor")" />
+                    <MudSelectItem Value="@("Porcukor")" />
+                    <MudSelectItem Value="@("Vaj / Margarin")" />
+                    <MudSelectItem Value="@("Tej / Víz")" />
+                    <MudSelectItem Value="@("Méz")" />
+                    <MudSelectItem Value="@("Kakaópor")" />
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Elevation="0" Class="pa-4" Style="background-color: #e0f2f1; border-radius: 8px; border-left: 5px solid #00897b;">
+            <MudText Typo="Typo.h5" Style="color: #00897b; font-weight: bold;">
+                Eredmény: @CalculateWeight()
+            </MudText>
+        </MudPaper>
+    </MudTabPanel>
+
+    @* 2. FÜL: HELYETTESÍTŐK (KIBŐVÍTVE) *@
+    <MudTabPanel Text="Mit mivel helyettesítsek?" Icon="@Icons.Material.Filled.SwapHoriz">
+        <MudText Typo="Typo.h6" Class="mb-4">Ha elfogyott valami otthon, ezekkel trükközhetsz:</MudText>
+
+        <MudSimpleTable Style="overflow-x: auto;" Hover="true">
+            <thead>
+                <tr>
+                    <th>Mi hiányzik?</th>
+                    <th>Mivel helyettesítsd? (1 adag / 1 db)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>1 db Tojás (sütéshez)</b></td>
+                    <td>½ pépesített érett banán VAGY 1 ek chia mag + 3 ek víz (15 percet állni hagyva)</td>
+                </tr>
+                <tr>
+                    <td><b>Sütőpor (1 teáskanál)</b></td>
+                    <td>¼ teáskanál szódabikarbóna + ½ teáskanál ecet vagy citromlé</td>
+                </tr>
+                <tr>
+                    <td><b>Vaj (sütéshez, 10 dkg)</b></td>
+                    <td>8 dkg kókuszolaj VAGY 10 dkg almapüré (ha egészségesebb sütit szeretnél)</td>
+                </tr>
+                <tr>
+                    <td><b>Főzőtejszín (1 dl)</b></td>
+                    <td>1 dl zsíros tej + 1 evőkanál olvasztott vaj elkeverve</td>
+                </tr>
+                <tr>
+                    <td><b>Zsemlemorzsa (panírhoz)</b></td>
+                    <td>Zúzott natúr kukoricapehely (cornflakes), zabpehely vagy darált dió/mandula</td>
+                </tr>
+                <tr>
+                    <td><b>Tejföl (1 pohár)</b></td>
+                    <td>Natúr joghurt VAGY kefir (kicsit sűrítve egy pici liszttel, ha főzöl vele)</td>
+                </tr>
+                <tr>
+                    <td><b>Búzaliszt (sűrítéshez, 1 ek)</b></td>
+                    <td>½ evőkanál kukoricakeményítő VAGY burgonyakeményítő</td>
+                </tr>
+                <tr>
+                    <td><b>Fehérbor (főzéshez, pl. rizottóba)</b></td>
+                    <td>Ugyanannyi csirkealaplé + 1 teáskanál fehérborecet vagy citromlé</td>
+                </tr>
+                <tr>
+                    <td><b>Fokhagyma (1 gerezd)</b></td>
+                    <td>⅛ teáskanál fokhagymapor</td>
+                </tr>
+                <tr>
+                    <td><b>Citromlé (1 evőkanál)</b></td>
+                    <td>½ evőkanál almaecet VAGY fehérborecet</td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudTabPanel>
+
+    @* 3. FÜL: FŐZÉSI IDŐK (KIBŐVÍTVE 4 KÁRTYÁRA) *@
+    <MudTabPanel Text="Tökéletes Főzési Idők" Icon="@Icons.Material.Filled.Timer">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="pa-4 h-100">
+                    <MudText Typo="Typo.h6" Class="mb-3">🥚 A tökéletes főtt tojás</MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2"><i>(Forrásban lévő vízbe téve, M-es tojás esetén)</i></MudText>
+                    <ul style="line-height: 1.8;">
+                        <li><b>3-4 perc:</b> Nagyon lágy (folyós sárgája és remegős fehérje)</li>
+                        <li><b>5-6 perc:</b> Lágytojás (szilárd fehérje, krémesen folyós sárgája)</li>
+                        <li><b>7-8 perc:</b> Tökéletes szendvicsbe (szilárd, krémes közép)</li>
+                        <li><b>10 perc:</b> Keménytojás (teljesen átsült, salátákhoz)</li>
+                    </ul>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="pa-4 h-100">
+                    <MudText Typo="Typo.h6" Class="mb-3">🥩 Húsok maghőmérséklete</MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2"><i>(Ha van húshőmérőd, ezek a biztonságos értékek)</i></MudText>
+                    <ul style="line-height: 1.8;">
+                        <li><b>Csirke / Pulyka:</b> 74 °C</li>
+                        <li><b>Sertés (karaj, szűz):</b> 63 °C (közepesen átsütve, pihentetve)</li>
+                        <li><b>Marha (Medium Rare - véres):</b> 54 - 57 °C</li>
+                        <li><b>Marha (Medium - közepes):</b> 60 - 63 °C</li>
+                    </ul>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="pa-4 h-100">
+                    <MudText Typo="Typo.h6" Class="mb-3">🍚 Rizs és Tészta (Al dente)</MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2"><i>(Az idő a víz újraforrásától számítandó)</i></MudText>
+                    <ul style="line-height: 1.8;">
+                        <li><b>Fehér rizs (Jázmin/Hosszúszemű):</b> 12-15 perc (fedő alatt, lassú tűzön)</li>
+                        <li><b>Barna rizs:</b> 40-45 perc</li>
+                        <li><b>Friss gyúrt tészta:</b> 2-3 perc</li>
+                        <li><b>Száraztészta (bolti):</b> 8-10 perc (kóstold 8 percnél!)</li>
+                    </ul>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="pa-4 h-100">
+                    <MudText Typo="Typo.h6" Class="mb-3">🥦 Zöldségek párolása</MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2"><i>(Gőz felett, hogy roppanós maradjon és megőrizze a vitaminokat)</i></MudText>
+                    <ul style="line-height: 1.8;">
+                        <li><b>Brokkoli rózsák:</b> 4-5 perc</li>
+                        <li><b>Sárgarépa (karikázva):</b> 7-9 perc</li>
+                        <li><b>Zöldbab / Spárga:</b> 4-6 perc</li>
+                        <li><b>Kockázott krumpli:</b> 10-12 perc</li>
+                    </ul>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+
+</MudTabs>
+
+@code {
+    // Kalkulátor változói
+    private double amount = 1;
+    private string selectedUnit = "Bögre (Cup)";
+    private string selectedIngredient = "Búzaliszt";
+
+    private string CalculateWeight()
+    {
+        double multiplier = 0;
+        string resultUnit = "g";
+
+        switch (selectedIngredient)
+        {
+            case "Búzaliszt":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 125;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 8;
+                else multiplier = 3;
+                break;
+            case "Kristálycukor":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 200;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 15;
+                else multiplier = 5;
+                break;
+            case "Porcukor":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 120;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 8;
+                else multiplier = 3;
+                break;
+            case "Vaj / Margarin":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 225;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 15;
+                else multiplier = 5;
+                break;
+            case "Méz":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 340;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 21;
+                else multiplier = 7;
+                break;
+            case "Kakaópor":
+                if (selectedUnit == "Bögre (Cup)") multiplier = 100;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 7;
+                else multiplier = 2.5;
+                break;
+            case "Tej / Víz":
+                resultUnit = "ml";
+                if (selectedUnit == "Bögre (Cup)") multiplier = 240;
+                else if (selectedUnit == "Evőkanál (EK)") multiplier = 15;
+                else multiplier = 5;
+                break;
+        }
+
+        double finalResult = Math.Round(amount * multiplier, 1);
+        return $"{finalResult} {resultUnit}";
+    }
+}

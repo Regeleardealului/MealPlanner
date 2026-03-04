@@ -1,0 +1,46 @@
+﻿@page "/recipe/edit/{Id:int}"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@using MealPlannerApp.Client.Components
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>MealPlanner</PageTitle>
+<MudText Typo="Typo.h3" GutterBottom="true">Recept Szerkesztése</MudText>
+
+@if (recipe == null)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <RecipeForm Recipe="recipe" OnValidSubmit="HandleSave" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Recipe? recipe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipe = await Http.GetFromJsonAsync<Recipe>($"api/recipes/{Id}");
+    }
+
+    private async Task HandleSave()
+    {
+        if (recipe == null) return;
+
+        var response = await Http.PutAsJsonAsync($"api/recipes/{Id}", recipe);
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Recept sikeresen módosítva!", Severity.Success);
+            Navigation.NavigateTo($"/recipe/{Id}");
+        }
+        else
+        {
+            Snackbar.Add("Hiba történt a módosítás során.", Severity.Error);
+        }
+    }
+}

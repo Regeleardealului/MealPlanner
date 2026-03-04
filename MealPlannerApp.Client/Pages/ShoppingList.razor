@@ -1,0 +1,93 @@
+﻿@page "/shoppinglist"
+@attribute [Authorize]
+@using MealPlannerApp.Shared.Models
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<PageTitle>MealPlanner</PageTitle>
+
+@* ÚJ, DIZÁJNOS FEJLÉC A TÖRLÉS GOMMBAL *@
+<div class="d-flex justify-space-between align-center mb-6">
+    <div>
+        <MudText Typo="Typo.h3" Class="mb-2" Style="color: #424242; font-weight: 600;">Miket kell megvennem? 🤔</MudText>
+        <MudText Typo="Typo.body1">Ez a lista a heti étlapterved alapján automatikusan generálódott.</MudText>
+    </div>
+
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Error"
+               StartIcon="@Icons.Material.Filled.DeleteSweep"
+               OnClick="ClearShoppingList"
+               Size="Size.Large">
+        Bevásárlólista ürítése
+    </MudButton>
+</div>
+
+@if (shoppingList == null)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!shoppingList.Any())
+{
+    <MudAlert Severity="Severity.Info">A bevásárlólista üres. Tervezz meg néhány étkezést az Étlaptervezőben!</MudAlert>
+}
+else
+{
+    <MudList T="ShoppingListItem" clickable="false">
+        @foreach (var group in shoppingList.GroupBy(item => item.Category))
+        {
+            <MudListSubheader Style="font-weight: bold; font-size: 1.1rem; color: #00897b;">@group.Key</MudListSubheader>
+            @foreach (var item in group)
+            {
+                <MudListItem>
+                    <MudCheckBox T="bool" Label="@($"{item.TotalQuantity} {item.Unit} - {item.Name}")" Color="Color.Primary" />
+                </MudListItem>
+            }
+        }
+    </MudList>
+}
+
+@code {
+    private List<ShoppingListItem>? shoppingList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            shoppingList = await Http.GetFromJsonAsync<List<ShoppingListItem>>("api/shoppinglist");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hiba a bevásárlólista lekérésekor: {ex.Message}");
+        }
+    }
+
+    private async Task ClearShoppingList()
+    {
+        try
+        {
+            // 1. Megpróbáljuk értesíteni a szervert a törlésről
+            var response = await Http.DeleteAsync("api/shoppinglist/clear");
+
+            // 2. Azonnal kiürítjük a listát a képernyőn (hogy a felhasználó lássa az eredményt)
+            if (shoppingList != null)
+            {
+                shoppingList.Clear();
+            }
+
+            // 3. Visszajelzés a felhasználónak
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("A bevásárlólista sikeresen kiürítve!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("A lista eltűnt a képernyőről (a végleges törléshez a szerver oldalt is be kell majd állítanunk).", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hiba a törléskor: {ex.Message}");
+            Snackbar.Add("Hiba történt a törlés során.", Severity.Error);
+        }
+    }
+}

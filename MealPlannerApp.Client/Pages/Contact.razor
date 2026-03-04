@@ -1,0 +1,124 @@
+﻿@page "/elerhetoseg"
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+
+<PageTitle>MealPlanner</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @* --- FEJLÉC --- *@
+    <MudText Typo="Typo.h2" Class="mb-4" Style="color: #00897b; font-weight: 700;">Lépj velünk kapcsolatba! 📬</MudText>
+    <MudText Typo="Typo.h6" Class="mb-10" Style="color: #616161;">Kérdésed van az Okos Konyhatárssal kapcsolatban? Esetleg egy új funkciót javasolnál? Írj nekünk bátran, imádjuk a visszajelzéseket!</MudText>
+
+    <MudGrid>
+        @* --- BAL OLDAL: KAPCSOLATI ADATOK (Mentazöld kártya) --- *@
+        <MudItem xs="12" md="5">
+            <MudCard Elevation="4" Class="pa-8 h-100" Style="border-radius: 16px; background-color: #00897b; color: white;">
+                <MudText Typo="Typo.h4" Class="mb-8" Style="font-weight: 600;">Elérhetőségek</MudText>
+
+                <MudList T="string" Class="custom-white-list">
+                    <MudListItem Icon="@Icons.Material.Filled.Email" IconColor="Color.Surface" Class="mb-2">
+                        <MudText Typo="Typo.body1" Style="font-size: 1.1rem;">info@mealplanner.hu</MudText>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Phone" IconColor="Color.Surface" Class="mb-2">
+                        <MudText Typo="Typo.body1" Style="font-size: 1.1rem;">+36 30 235 2865</MudText>
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.LocationOn" IconColor="Color.Surface">
+                        <MudText Typo="Typo.body1" Style="font-size: 1.1rem;">4028, Debrecen Kassai út 26.</MudText>
+                    </MudListItem>
+                </MudList>
+
+                <MudDivider Class="my-8" Style="background-color: rgba(255,255,255,0.3); height: 2px;" />
+
+                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: 400;">Kövess minket a közösségi médiában is!</MudText>
+                <div class="d-flex gap-4">
+                    <MudIconButton Icon="@Icons.Custom.Brands.Facebook" Color="Color.Surface" Size="Size.Large" />
+                    <MudIconButton Icon="@Icons.Custom.Brands.Instagram" Color="Color.Surface" Size="Size.Large" />
+                    <MudIconButton Icon="@Icons.Custom.Brands.Twitter" Color="Color.Surface" Size="Size.Large" />
+                </div>
+            </MudCard>
+        </MudItem>
+
+        @* --- JOBB OLDAL: ÜZENETKÜLDŐ ŰRLAP --- *@
+        <MudItem xs="12" md="7">
+            <MudCard Elevation="4" Class="pa-8 h-100" Style="border-radius: 16px;">
+                <MudText Typo="Typo.h5" Class="mb-6" Style="font-weight: 600; color: #424242;">Küldj nekünk üzenetet</MudText>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="contactName" Label="Neved" Variant="Variant.Outlined" Class="mb-4" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="contactEmail" Label="E-mail címed" Variant="Variant.Outlined" InputType="InputType.Email" Class="mb-4" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudTextField @bind-Value="contactSubject" Label="Tárgy" Variant="Variant.Outlined" Class="mb-4" />
+
+                <MudTextField @bind-Value="contactMessage" Label="Üzeneted..." Variant="Variant.Outlined" Lines="6" Class="mb-6" />
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           OnClick="SendMessage"
+                           Disabled="@isSending"
+                           FullWidth="true"
+                           Style="padding: 12px; font-size: 1.1rem; border-radius: 8px;">
+                    @if (isSending)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Küldés folyamatban...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Üzenet elküldése</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Send" Class="ml-2" Size="Size.Small"></MudIcon>
+                    }
+                </MudButton>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@* --- CSS A FEHÉR SZÖVEGEKHEZ A MENTAZÖLD KÁRTYÁN --- *@
+<style>
+    .custom-white-list .mud-typography {
+        color: white !important;
+    }
+</style>
+
+@code {
+    private string contactName = "";
+    private string contactEmail = "";
+    private string contactSubject = "";
+    private string contactMessage = "";
+    private bool isSending = false;
+
+    private async Task SendMessage()
+    {
+        // 1. Alapvető ellenőrzés: ki van-e töltve minden?
+        if (string.IsNullOrWhiteSpace(contactName) ||
+            string.IsNullOrWhiteSpace(contactEmail) ||
+            string.IsNullOrWhiteSpace(contactMessage))
+        {
+            Snackbar.Add("Kérlek, töltsd ki a neved, e-mail címed és az üzenet mezőt!", Severity.Warning);
+            return;
+        }
+
+        isSending = true;
+
+        // 2. Szimulálunk egy kis hálózati töltést (mintha tényleg elküldené a szervernek)
+        // Később ide be lehet kötni egy igazi e-mail küldő API-t!
+        await Task.Delay(1500);
+
+        // 3. Visszajelzés a felhasználónak
+        Snackbar.Add("Köszönjük az üzenetet! Hamarosan felvesszük veled a kapcsolatot.", Severity.Success);
+
+        // 4. Űrlap kiürítése a sikeres küldés után
+        contactName = "";
+        contactEmail = "";
+        contactSubject = "";
+        contactMessage = "";
+
+        isSending = false;
+    }
+}

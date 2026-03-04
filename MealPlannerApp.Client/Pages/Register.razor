@@ -1,0 +1,119 @@
+﻿@page "/register"
+@layout MealPlannerApp.Client.Layout.AuthLayout
+@using MealPlannerApp.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+@* A logó stílusos megjelenítése *@
+<MudImage Src="MealPlanner.png" Alt="MealPlanner Logo" Class="mx-auto d-block mb-6" Style="width: 150px;" />
+<MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">Regisztráció</MudText>
+
+<MudForm @ref="form">
+    @* ÚJ MEZŐ: Felhasználónév *@
+    <MudTextField T="string" @bind-Value="registerDto.Username"
+                  Label="Felhasználónév"
+                  Variant="Variant.Outlined"
+                  ShrinkLabel="true"
+                  Required="true"
+                  RequiredError="A felhasználónév megadása kötelező!"
+                  Class="mb-4" />
+
+    <MudTextField T="string" @bind-Value="registerDto.Email"
+                  Label="Email cím"
+                  Variant="Variant.Outlined"
+                  ShrinkLabel="true"
+                  Required="true"
+                  RequiredError="Az email cím megadása kötelező!"
+                  InputType="InputType.Email"
+                  Class="mb-4" />
+
+    <MudTextField T="string" @bind-Value="registerDto.Password"
+                  Label="Jelszó"
+                  Variant="Variant.Outlined"
+                  ShrinkLabel="true"
+                  Required="true"
+                  RequiredError="A jelszó megadása kötelező!"
+                  InputType="InputType.Password"
+                  Class="mb-4" />
+
+    <MudTextField T="string" @bind-Value="confirmPassword"
+                  Label="Jelszó megerősítése"
+                  Variant="Variant.Outlined"
+                  ShrinkLabel="true"
+                  Required="true"
+                  RequiredError="A jelszó megerősítése kötelező!"
+                  InputType="InputType.Password"
+                  Class="mb-6" />
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="mb-4" Variant="Variant.Filled">@errorMessage</MudAlert>
+    }
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               FullWidth="true"
+               Size="Size.Large"
+               OnClick="HandleRegister"
+               Disabled="@processing">
+        @if (processing)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+            <MudText Class="ms-2">Feldolgozás...</MudText>
+        }
+        else
+        {
+            <MudText>Regisztráció</MudText>
+        }
+    </MudButton>
+</MudForm>
+
+<MudText Align="Align.Center" Class="mt-4">
+    Van már fiókod? <MudLink Href="/login">Jelentkezz be itt!</MudLink>
+</MudText>
+
+@code {
+    private UserRegisterDto registerDto = new();
+    private string confirmPassword = "";
+    private string? errorMessage;
+    private bool processing = false;
+    private MudForm? form;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = null;
+
+        if (registerDto.Password != confirmPassword)
+        {
+            errorMessage = "A két jelszó nem egyezik meg!";
+            return;
+        }
+
+        processing = true;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/register", registerDto);
+            var result = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
+
+            if (response.IsSuccessStatusCode && result!.IsAuthSuccessful)
+            {
+                Snackbar.Add("Sikeres regisztráció! Most már bejelentkezhetsz.", Severity.Success);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                errorMessage = result?.ErrorMessage ?? "A regisztráció nem sikerült!";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Hiba történt a szerverrel való kapcsolat során.";
+        }
+        finally
+        {
+            processing = false;
+        }
+    }
+}
