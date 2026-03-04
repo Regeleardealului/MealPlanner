@@ -8,7 +8,7 @@ namespace MealPlannerApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Biztonsági lakat: csak bejelentkezve lehessen lekérni vagy törölni
+    [Authorize]
     public class ShoppingListController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -43,33 +43,29 @@ namespace MealPlannerApp.Controllers
                     Name = group.Key.Name,
                     Unit = group.Key.Unit,
                     TotalQuantity = group.Sum(item => item.Quantity),
-                    Category = GetCategoryForIngredient(group.Key.Name) // KATEGÓRIA HOZZÁRENDELÉSE
+                    Category = GetCategoryForIngredient(group.Key.Name) 
                 })
-                .OrderBy(item => item.Category) // Rendezés kategória szerint
-                .ThenBy(item => item.Name)      // Majd név szerint
+                .OrderBy(item => item.Category) 
+                .ThenBy(item => item.Name)    
                 .ToList();
 
             return Ok(shoppingList);
         }
 
-        // ÚJ VÉGPONT: A bevásárlólista (és a hozzá tartozó heti terv) végleges ürítése
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearShoppingList()
         {
-            // Lekérjük az aktuális tervezést az adatbázisból
             var currentEntries = await _context.MealPlanEntries.ToListAsync();
 
             if (currentEntries.Any())
             {
-                // Kitöröljük az étlaptervet, mintha egy új hetet kezdenénk
                 _context.MealPlanEntries.RemoveRange(currentEntries);
                 await _context.SaveChangesAsync();
             }
 
-            return Ok(); // Visszaszólunk a felületnek, hogy "Minden sikeresen törölve!"
+            return Ok(); 
         }
 
-        // Egyszerű segédfüggvény a kategorizáláshoz
         private string GetCategoryForIngredient(string ingredientName)
         {
             var name = ingredientName.ToLower();
