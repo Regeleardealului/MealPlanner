@@ -1,0 +1,68 @@
+﻿@using MealPlannerApp.Shared.Models
+
+<MudForm @ref="form" @bind-IsValid="@success">
+    <MudCard Class="pa-4">
+        <MudCardContent>
+            @* A form többi része változatlan... *@
+            <MudTextField @bind-Value="Recipe.Title" Label="Cím" Required="true" RequiredError="A cím kötelező!" />
+            <MudTextField @bind-Value="Recipe.Description" Label="Leírás" Lines="3" Class="mt-3" />
+            <MudTextField @bind-Value="Recipe.ImageUrl" Label="Kép URL" Class="mt-3" />
+            <MudNumericField @bind-Value="Recipe.PrepTimeInMinutes" Label="Elkészítési idő (perc)" Min="1" Class="mt-3" />
+            <MudSelect T="DifficultyLevel" @bind-Value="Recipe.Difficulty" Label="Nehézség" Class="mt-3">
+                @foreach (DifficultyLevel level in Enum.GetValues(typeof(DifficultyLevel)))
+                {
+                    <MudSelectItem T="DifficultyLevel" Value="@level">@level</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField @bind-Value="Recipe.Instructions" Label="Elkészítés" Lines="5" Class="mt-3" />
+
+            <MudText Typo="Typo.h6" Class="mt-4">Hozzávalók</MudText>
+            @foreach (var ingredient in Recipe.Ingredients.ToList())
+            {
+                <MudGrid Spacing="1" Class="align-center my-1">
+                    <MudItem xs="4"><MudTextField @bind-Value="ingredient.Name" Dense="true" Margin="Margin.Dense" Label="Név" Required="true" RequiredError="Kötelező" /></MudItem>
+                    <MudItem xs="3"><MudNumericField T="decimal" @bind-Value="ingredient.Quantity" Dense="true" Margin="Margin.Dense" Label="Mennyiség" Min="0" /></MudItem>
+                    <MudItem xs="3"><MudTextField @bind-Value="ingredient.Unit" Dense="true" Margin="Margin.Dense" Label="Egység" Required="true" RequiredError="Kötelező" /></MudItem>
+                    <MudItem xs="2"><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveIngredient(ingredient))" /></MudItem>
+                </MudGrid>
+            }
+            <MudButton OnClick="AddIngredient" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2">Hozzávaló hozzáadása</MudButton>
+
+        </MudCardContent>
+        <MudCardActions>
+            @* JAVÍTÁS ITT: ButtonType="Submit" helyett direkt @onclick hívást használunk *@
+            <MudButton OnClick="SubmitFormAsync" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!success)" Class="ml-auto">Mentés</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudForm>
+
+@code {
+    [Parameter]
+    public Recipe Recipe { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Recipe> OnValidSubmit { get; set; }
+
+    private MudForm form = null!;
+    private bool success;
+
+    private void AddIngredient()
+    {
+        Recipe.Ingredients.Add(new Ingredient());
+    }
+
+    private void RemoveIngredient(Ingredient ingredient)
+    {
+        Recipe.Ingredients.Remove(ingredient);
+    }
+
+    // Ez a metódus most már a gomb @onclick eseményére van kötve
+    private async Task SubmitFormAsync()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            await OnValidSubmit.InvokeAsync(Recipe);
+        }
+    }
+}
