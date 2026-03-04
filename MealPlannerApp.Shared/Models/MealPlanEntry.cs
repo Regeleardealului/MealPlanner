@@ -8,15 +8,16 @@ namespace MealPlannerApp.Shared.Models
         public int Id { get; set; }
 
         [Required]
-        public DayOfWeek Day { get; set; } // Hétfő, Kedd, stb.
+        public DayOfWeek Day { get; set; } 
 
         [Required]
-        public MealType Type { get; set; } // Reggeli, Ebéd, Vacsora
+        public MealType Type { get; set; } 
 
         [Required]
         public int RecipeId { get; set; }
 
         [ForeignKey("RecipeId")]
-        public Recipe? Recipe { get; set; } // Kapcsolat a recepthez
+        public Recipe? Recipe { get; set; } 
     }
+
 }
