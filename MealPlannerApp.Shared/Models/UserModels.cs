@@ -8,7 +8,6 @@ namespace MealPlannerApp.Shared.Models
 {
     public class UserRegisterDto
     {
-        // ÚJ MEZŐ: Felhasználónév
         public string Username { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
@@ -28,3 +27,4 @@ namespace MealPlannerApp.Shared.Models
         public string? ErrorMessage { get; set; }
     }
 }
+
