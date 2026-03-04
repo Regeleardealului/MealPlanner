@@ -1,0 +1,23 @@
+﻿<div style="padding-bottom: 80px;">
+    @* --- FELSŐ RÉSZ: A MENÜPONTOK --- *@
+    <MudNavMenu>
+        <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.MenuBook">Receptkönyv</MudNavLink>
+        <MudNavLink Href="chat" Icon="@Icons.Material.Filled.AutoAwesome">Ajánlórendszer</MudNavLink>
+        <MudNavLink Href="mealplanner" Icon="@Icons.Material.Filled.EditCalendar">Étlaptervező</MudNavLink>
+        <MudNavLink Href="shoppinglist" Icon="@Icons.Material.Filled.ShoppingCart">Bevásárlólista</MudNavLink>
+        <MudNavLink Href="/konyhai-kisokos" Icon="@Icons.Material.Filled.Lightbulb">Konyhai Kisokos</MudNavLink>
+        <MudNavLink Href="/mit-fozzek" Icon="@Icons.Material.Filled.Sync">Szerencsekerék</MudNavLink>
+        <MudNavLink Href="/profil" Icon="@Icons.Material.Filled.ManageAccounts">Profil & Beállítások</MudNavLink>
+        <MudNavLink Href="/elerhetoseg" Icon="@Icons.Material.Filled.ContactMail">Elérhetőség</MudNavLink>
+    </MudNavMenu>
+</div>
+
+@* --- ALSÓ RÉSZ: ODARAGASZTVA A BAL ALSÓ SAROKBA --- *@
+<div style="position: absolute; bottom: 16px; left: 0; width: 100%; text-align: center; pointer-events: none;">
+    <MudText Typo="Typo.caption" Style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; display: block;">
+        © @DateTime.Now.Year Sógor Gergely
+    </MudText>
+    <MudText Typo="Typo.caption" Style="color: rgba(255, 255, 255, 0.5); font-size: 0.7rem;">
+        Minden jog fenntartva.
+    </MudText>
+</div>

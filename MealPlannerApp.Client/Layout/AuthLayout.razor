@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="_authTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+@* Ez a rész felel azért, hogy a tartalom a képernyő legközepén legyen, egy világosszürke háttér előtt *@
+<div class="d-flex align-center justify-center" style="min-height: 100vh; background-color: #f4f6f8;">
+    <MudPaper Elevation="4" Class="pa-8" Style="width: 100%; max-width: 450px; border-radius: 12px;">
+        @Body
+    </MudPaper>
+</div>
+
+@code {
+    private MudTheme _authTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#00897b"
+        },
+        Typography = new Typography()
+        {
+            Default = new DefaultTypography()
+            {
+                FontFamily = new[] { "Quicksand", "sans-serif" }
+            }
+        }
+    };
+}
