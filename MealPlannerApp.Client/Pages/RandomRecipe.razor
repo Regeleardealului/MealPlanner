@@ -68,7 +68,6 @@
                         <div class="d-flex justify-center gap-4">
                             <MudChip T="string" Color="Color.Info" Icon="@Icons.Material.Filled.Timer">@selectedRecipe.PrepTimeInMinutes perc</MudChip>
 
-                            @* JAVÍTVA: A kérdőjelek eltűntek, mivel az Enum nem lehet null *@
                             <MudChip T="string" Color="@GetDifficultyColor(selectedRecipe.Difficulty.ToString())" Icon="@Icons.Material.Filled.SignalCellularAlt">@selectedRecipe.Difficulty.ToString()</MudChip>
                         </div>
                     </MudCardContent>
