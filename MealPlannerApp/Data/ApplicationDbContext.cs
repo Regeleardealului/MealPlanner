@@ -17,18 +17,14 @@ namespace MealPlannerApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Nagyon fontos: Identity használatakor először az alap osztály 
-            // OnModelCreating metódusát kell meghívni!
             base.OnModelCreating(modelBuilder);
 
-            // Ez a rész konvertálja a List<string>-et egyetlen stringgé és vissza
             modelBuilder.Entity<Recipe>()
                 .Property(e => e.Tags)
                 .HasConversion(
                     v => string.Join(',', v),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
 
-            // Adatbázis inicializálása adatokkal
             modelBuilder.Seed();
         }
     }
