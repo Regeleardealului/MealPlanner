@@ -5,12 +5,11 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
-@* A logó stílusos megjelenítése *@
+
 <MudImage Src="MealPlanner.png" Alt="MealPlanner Logo" Class="mx-auto d-block mb-6" Style="width: 150px;" />
 <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">Regisztráció</MudText>
 
 <MudForm @ref="form">
-    @* ÚJ MEZŐ: Felhasználónév *@
     <MudTextField T="string" @bind-Value="registerDto.Username"
                   Label="Felhasználónév"
                   Variant="Variant.Outlined"
