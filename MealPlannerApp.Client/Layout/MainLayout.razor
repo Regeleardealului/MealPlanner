@@ -13,26 +13,21 @@
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
 
-        @* --- JAVÍTOTT, ELEGÁNS CÍM ÉS MOTTÓ --- *@
         <div class="d-flex align-center ml-3">
             @* A főcím (MealPlanner) *@
             <MudText Typo="Typo.h5" Style="font-weight: 700; margin-bottom: 0;">MealPlanner</MudText>
 
-            @* Az elválasztó szimbólum (Visszafogott átlátszósággal) *@
             <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Class="mx-2" Style="opacity: 0.6;" />
 
-            @* A mottó (Dőlt, elegáns serif betűvel, picit kisebben) *@
             <MudText Style="font-family: 'Georgia', serif; font-style: italic; font-size: 1.1rem; opacity: 0.9; margin-bottom: 0; padding-top: 3px;">
                 Tervezz, főzz, élj tudatosan
             </MudText>
 
-            @* Az elválasztó szimbólum (Visszafogott átlátszósággal) *@
             <MudIcon Icon="@Icons.Material.Filled.ChevronLeft" Size="Size.Small" Class="mx-2" Style="opacity: 0.6;" />
         </div>
 
         <MudSpacer />
 
-        @* Felhasználói infó és Kijelentkezés *@
         <AuthorizeView>
             <Authorized>
                 <MudText Typo="Typo.body1" Class="mr-4 d-none d-sm-inline">
@@ -74,13 +69,10 @@
 
     private async Task Logout()
     {
-        // 1. Töröljük a tokent a böngésző tárolójából
         await LocalStorage.RemoveItemAsync("authToken");
 
-        // 2. Szólunk a rendszernek, hogy a felhasználó kijelentkezett
         ((ApiAuthenticationStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
 
-        // 3. Visszairányítás a login oldalra
         Navigation.NavigateTo("/login");
     }
 
