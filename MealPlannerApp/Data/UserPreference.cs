@@ -7,7 +7,6 @@ namespace MealPlannerApp.Data
         [Key]
         public int Id { get; set; }
 
-        // Ezzel kötjük össze a beállítást az aktuális felhasználóval
         public string UserId { get; set; } = string.Empty;
 
         public bool IsVegan { get; set; }
