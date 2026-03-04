@@ -24,7 +24,6 @@ namespace MealPlannerApp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto userDto)
         {
-            // ITT A VÁLTOZÁS: A UserName most már a userDto.Username lesz, az Email pedig az Email!
             var user = new IdentityUser { UserName = userDto.Username, Email = userDto.Email };
             var result = await _userManager.CreateAsync(user, userDto.Password);
 
@@ -49,13 +48,13 @@ namespace MealPlannerApp.Controllers
         {
             var claims = new[]
             {
-                // Mivel a Register-nél beállítottuk a rendes UserName-t, ez a Claim azt fogja tartalmazni!
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email!)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("EzEgyNagyonHosszuEsBiztonsagosTitkosKulcs1234567890!"));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
