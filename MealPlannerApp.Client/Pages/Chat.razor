@@ -35,14 +35,11 @@
     private string currentMessage = "";
     private bool isLoading = false;
 
-    // ITT VAN AZ ÚJ, SZEMÉLYRE SZABOTT KÖSZÖNÉS
     protected override async Task OnInitializedAsync()
     {
-        // Lekérjük, ki van épp bejelentkezve
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userName = authState.User.Identity?.Name ?? "Szakács";
 
-        // Beállítjuk a kezdő üzenetet a felhasználó nevével
         messages.Add(new ConversationMessage
         {
             Role = "assistant",
